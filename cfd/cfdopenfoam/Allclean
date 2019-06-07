@@ -1,0 +1,18 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/CleanFunctions
+
+cleanCase
+
+rm -f logMeshing
+rm -f logSimulation 
+rm -rf postProcessing
+rm -rf processor0
+rm -rf processor1
+rm -rf processor2
+rm -rf constant/polyMesh
+rm -rf constant/extendedFeatureEdgeMesh
+
+#------------------------------------------------------------------------------

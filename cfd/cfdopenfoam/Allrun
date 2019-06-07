@@ -1,0 +1,44 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+cd ${0%/*} || exit 1
+clear
+./Allclean
+##  MESHING ##
+#------------------------------------------------------------------------------	
+	echo "BlockMesh"
+	blockMesh >> logMeshing
+#------------------------------------------------------------------------------
+	surfaceFeatureExtract >> logMeshing
+#------------------------------------------------------------------------------
+	snappyHexMesh -overwrite >> logMeshing
+#------------------------------------------------------------------------------
+	echo "extrudeMesh"
+	extrudeMesh >> logMeshing
+#------------------------------------------------------------------------------
+	echo "createPatch"	
+	createPatch -overwrite  >> logMeshing
+#------------------------------------------------------------------------------
+	changeDictionary  >> logMeshing
+	
+##  SIMULATION ##
+#------------------------------------------------------------------------------
+	echo "DecomposePar"
+	decomposePar
+    echo "PimpleFoam"
+	mpirun -np 36 pimpleFoam -parallel >> logSimulation
+    echo "ReconstructPar"
+	reconstructPar
+	cd postProcessing/forces1/0
+	mv forces.dat forces1.dat
+	cd ../../forces2/0
+	mv forces.dat forces2.dat
+	cd ../../forces3/0
+	mv forces.dat forces3.dat
+	cd ../../..
+	mkdir simvalue/CP$1
+	cp postProcessing/forces1/0/forces1.dat simvalue/CP$1
+	cp postProcessing/forces2/0/forces2.dat simvalue/CP$1
+	cp postProcessing/forces3/0/forces3.dat simvalue/CP$1
+#------------------------------------------------------------------------------
+##  OVER  ##
+#------------------------------------------------------------------------------
